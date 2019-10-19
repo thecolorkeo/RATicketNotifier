@@ -7,6 +7,14 @@ toAddress = os.environ['email_address']
 # --------------------------------------------------------
 
 
+"""
+Scrapes page and splits html response
+Counts the number of "closed" instances on the page
+If the number of closed instances decreases (ie a ticket
+becomes available), send an email.
+"""
+
+
 def get_page(url: str):
     page = requests.get(url)
     page.raise_for_status()
