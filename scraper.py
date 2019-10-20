@@ -1,4 +1,4 @@
-import bs4, requests, smtplib, os
+import bs4, requests, smtplib, os, sched, time
 from datetime import datetime
 
 # ------------------- E-mail list ------------------------
@@ -36,12 +36,24 @@ def send_email(body):
     conn.quit()
     print(f'Sent notification e-mails for the following recipients: {toAddress}')
 
+def poll_page():
+    page = get_page(os.environ['page_url'])
+    subset = split_by_tag(page.text, '.ticket-list-item')
+    freq = subset.count('closed')
+
+    if freq < 4:
+        send_email(f'''Subject: Tickets available ({datetime.now().strftime("%I:%M:%S %p")})!\n\n
+            Number available: {4 - freq}\n\n
+            Raw text: {subset}''')
+        print("Tickets available! Sent email")
+    else:
+        print("No available tickets, did not send email")
+
 
 if __name__ == '__main__':
-    page = get_page(os.environ['page'])
-    subset = split_by_tag(page.text, ".ticket-list-item")
-    freq = subset.count("closed")
-
-    if freq == 4:
-        send_email(f'''Subject: Tickets available ({datetime.now().strftime("%H:%M:%S")})!\n\n
-        Number available: {4 - freq}''')
+    starttime = time.time()
+    delay = 60.0
+    while True:
+        print(f"polling {datetime.now()}")
+        poll_page()
+        time.sleep(delay - ((time.time() - starttime) % delay))
