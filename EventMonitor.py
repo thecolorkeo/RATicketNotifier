@@ -51,7 +51,7 @@ def send_email(body):
 
 def parse_page(page):
     subset = split_by_tag(page, '.ticket-list-item')
-    num_ticket_releases = subset.count("release")
+    num_ticket_releases = subset.count('release')
     current_closed_releases = subset.count('closed')
 
     if current_closed_releases < num_ticket_releases:
