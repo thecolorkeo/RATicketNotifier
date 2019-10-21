@@ -44,7 +44,7 @@ def send_email(body):
     conn.ehlo()  # call this to start the connection
     conn.starttls()  # starts tls encryption. When we send our password it will be encrypted.
     conn.login(fromAddress, os.environ['appkey'])
-    conn.sendmail(fromAddress, toAddress, f'Subject: Unter Alert at {datetime.now().strftime("%H:%M:%S")}!\n\n{body}')
+    conn.sendmail(fromAddress, toAddress, f'Subject: Ticket alert at {datetime.now().strftime("%H:%M:%S")}!\n\n{body}')
     conn.quit()
     print(f'Sent notification e-mails for the following recipients: {toAddress}')
 
@@ -56,21 +56,23 @@ def parse_page(page):
 
     if current_closed_releases < num_ticket_releases:
         send_email(f'''Subject: Tickets available ({datetime.now().strftime("%I:%M:%S %p")})!\n\n
-        Number available: {4 - current_closed_releases}\n\n
+        Number available: {num_ticket_releases - current_closed_releases}\n\n
         Raw text: {subset.encode('utf-8')}''')
+        print("* ---------------------------------------------------------------- *")
         print("Tickets available! Sent email")
+        print("* ---------------------------------------------------------------- *")
     else:
         print("No available tickets, did not send email")
 
 
 if __name__ == '__main__':
     starttime = time.time()
-    delay = 30.0
+    delay = 15.0
 
     while True:
         try:
             page = get_page(os.environ['page_url']).text
-            print(f"polling {datetime.now()}. Current number of members attending: {count_attending(page)}")
+            print(f"Polling {datetime.now()}. Current number of members attending: {count_attending(page)}")
             parse_page(page)
             time.sleep(delay - ((time.time() - starttime) % delay))
         except Exception as e:
