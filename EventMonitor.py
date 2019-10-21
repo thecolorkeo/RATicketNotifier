@@ -1,4 +1,4 @@
-import bs4, requests, smtplib, os, sched, time
+import bs4, requests, smtplib, os, time
 from datetime import datetime
 
 # ------------------- E-mail list ------------------------
@@ -67,10 +67,11 @@ if __name__ == '__main__':
     starttime = time.time()
     delay = 30.0
 
-    page = get_page(os.environ['page_url']).text
-    parse_page(page)
-
     while True:
-        print(f"polling {datetime.now()}. Current number of members attending: {count_attending(page)}")
-        parse_page(page)
-        time.sleep(delay - ((time.time() - starttime) % delay))
+        try:
+            page = get_page(os.environ['page_url']).text
+            print(f"polling {datetime.now()}. Current number of members attending: {count_attending(page)}")
+            parse_page(page)
+            time.sleep(delay - ((time.time() - starttime) % delay))
+        except Exception as e:
+            print(f"Unexpected exception: {e}")
