@@ -44,9 +44,9 @@ def send_email(body):
     conn.ehlo()  # call this to start the connection
     conn.starttls()  # starts tls encryption. When we send our password it will be encrypted.
     conn.login(fromAddress, os.environ['appkey'])
+    print(f'Sending emails to the following recipients: {toAddress}')
     conn.sendmail(fromAddress, toAddress, f'Subject: Ticket alert at {datetime.now().strftime("%H:%M:%S")}!\n\n{body}')
     conn.quit()
-    print(f'Sent notification e-mails for the following recipients: {toAddress}')
 
 
 def parse_page(page):
@@ -67,7 +67,7 @@ def parse_page(page):
 
 if __name__ == '__main__':
     starttime = time.time()
-    delay = 15.0
+    delay = 30.0
 
     while True:
         try:
